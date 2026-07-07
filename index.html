@@ -22,6 +22,23 @@
     --yellow:#f9e2af;
     --teal:#94e2d5;
   }
+
+  html.light-mode {
+    --bg: #f5f5f7;
+    --bg-darker: #efefef;
+    --panel: #ffffff;
+    --line: #e5e5e7;
+    --text: #1d1d1f;
+    --muted: #86868b;
+    --green: #34c759;
+    --blue: #0a84ff;
+    --peach: #ff9500;
+    --red: #ff3b30;
+    --mauve: #af52de;
+    --yellow: #ffd60a;
+    --teal: #30b0c0;
+  }
+
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
   body{
@@ -30,6 +47,7 @@
     font-family:'Inter', sans-serif;
     line-height:1.6;
     overflow-x:hidden;
+    transition: background 0.3s, color 0.3s;
   }
   ::selection{background:var(--mauve); color:var(--bg-darker);}
 
@@ -37,18 +55,48 @@
   .titlebar{
     background:var(--bg-darker);
     border-bottom:1px solid var(--line);
-    display:flex; align-items:center;
+    display:flex; align-items:center; justify-content: space-between;
     padding:0 16px;
     height:42px;
     position:sticky; top:0; z-index:50;
+    transition: background 0.3s, border-color 0.3s;
   }
-  .dots{display:flex; gap:8px; margin-right:18px;}
+  .dots{display:flex; gap:8px;}
   .dot{width:12px; height:12px; border-radius:50%;}
   .dot.r{background:var(--red);} .dot.y{background:var(--yellow);} .dot.g{background:var(--green);}
   .titlebar-name{
     font-family:'JetBrains Mono', monospace;
     font-size:13px;
     color:var(--muted);
+    flex:1;
+    margin-left:18px;
+  }
+
+  .theme-toggle {
+    background: transparent;
+    border: 1px solid var(--line);
+    color: var(--text);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: all 0.3s;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .theme-toggle:hover {
+    border-color: var(--blue);
+    color: var(--blue);
+  }
+
+  /* Progress bar */
+  .progress-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 2px;
+    background: linear-gradient(90deg, var(--blue), var(--green), var(--mauve));
+    z-index: 99;
+    transition: width 0.1s ease;
   }
 
   .layout{
@@ -67,6 +115,7 @@
     align-self:flex-start;
     height:calc(100vh - 42px);
     flex-shrink:0;
+    transition: background 0.3s, border-color 0.3s;
   }
   .sidebar-title{
     font-family:'JetBrains Mono', monospace;
@@ -104,6 +153,7 @@
     background:var(--bg-darker);
     border-bottom:1px solid var(--line);
     overflow-x:auto;
+    transition: background 0.3s, border-color 0.3s;
   }
   .tab{
     font-family:'JetBrains Mono', monospace;
@@ -134,6 +184,7 @@
     font-size:clamp(34px, 6vw, 58px);
     line-height:1.05;
     color:var(--text);
+    min-height: 70px;
   }
   .hero h1 .accent{color:var(--green);}
   .hero .role{
@@ -163,6 +214,17 @@
     border-radius:5px;
     color:var(--teal);
     background:rgba(148,226,213,0.06);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .badge:hover {
+    transform: translateY(-2px);
+    border-color: var(--teal);
+    background: rgba(148,226,213,0.12);
+  }
+  .badge.active {
+    background: rgba(148,226,213,0.25);
+    color: var(--teal);
   }
 
   /* ---------- section heading ---------- */
@@ -185,6 +247,7 @@
     border-radius:8px;
     padding:22px 26px;
     overflow-x:auto;
+    transition: background 0.3s, border-color 0.3s;
   }
   .jk{color:var(--blue);}
   .jv{color:var(--green);}
@@ -200,9 +263,26 @@
     padding:16px 18px;
     cursor:pointer;
     transition:.2s;
+    position: relative;
+    overflow: hidden;
   }
   .skill-card:hover{border-color:var(--blue); transform:translateY(-2px);}
-  .skill-head{display:flex; justify-content:space-between; align-items:center; font-family:'JetBrains Mono',monospace; font-size:13.5px;}
+  .skill-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, transparent, rgba(137, 180, 250, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s;
+    pointer-events: none;
+  }
+  .skill-card:hover::before {
+    opacity: 1;
+  }
+  .skill-head{display:flex; justify-content:space-between; align-items:center; font-family:'JetBrains Mono',monospace; font-size:13.5px; position: relative; z-index: 1;}
   .skill-bar{height:5px; background:var(--line); border-radius:3px; margin-top:10px; overflow:hidden;}
   .skill-fill{height:100%; background:linear-gradient(90deg, var(--blue), var(--teal)); width:0%; border-radius:3px; transition:width 1.2s cubic-bezier(.2,.8,.2,1);}
   .skill-pct{color:var(--muted); font-size:12px;}
@@ -211,13 +291,36 @@
   .timeline{position:relative; padding-left:26px;}
   .timeline::before{content:''; position:absolute; left:6px; top:6px; bottom:6px; width:1px; background:var(--line);}
   .tl-item{position:relative; margin-bottom:28px;}
-  .tl-dot{position:absolute; left:-26px; top:5px; width:11px; height:11px; border-radius:50%; background:var(--bg); border:2px solid var(--green);}
+  .tl-dot{position:absolute; left:-26px; top:5px; width:11px; height:11px; border-radius:50%; background:var(--bg); border:2px solid var(--green); transition: all 0.3s;}
   .tl-item.now .tl-dot{background:var(--green); box-shadow:0 0 0 4px rgba(166,227,161,0.15);}
+  .tl-dot:hover { transform: scale(1.3); }
   .tl-year{font-family:'JetBrains Mono',monospace; color:var(--peach); font-size:12.5px;}
   .tl-title{font-weight:600; margin-top:2px;}
   .tl-desc{color:var(--muted); font-size:14px; margin-top:3px;}
 
   /* ---------- projects ---------- */
+  .proj-filter {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .filter-btn {
+    font-family:'JetBrains Mono', monospace;
+    font-size: 12px;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    border-radius: 5px;
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+  .filter-btn:hover, .filter-btn.active {
+    border-color: var(--blue);
+    color: var(--blue);
+    background: rgba(137, 180, 250, 0.1);
+  }
   .proj-grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(260px,1fr)); gap:16px;}
   .proj-card{
     background:var(--panel);
@@ -226,7 +329,7 @@
     padding:20px;
     transition:.2s;
   }
-  .proj-card:hover{border-color:var(--mauve);}
+  .proj-card:hover{border-color:var(--mauve); transform: translateY(-4px);}
   .proj-name{font-family:'JetBrains Mono',monospace; color:var(--text); font-weight:600; font-size:15px;}
   .proj-desc{color:var(--muted); font-size:13.5px; margin-top:8px;}
   .proj-tags{display:flex; gap:6px; flex-wrap:wrap; margin-top:14px;}
@@ -247,7 +350,7 @@
     border-bottom:1px solid var(--line);
   }
   .term-bar span{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--muted); margin-left:6px;}
-  .term-body{padding:18px 20px; font-family:'JetBrains Mono',monospace; font-size:13.5px; min-height:180px;}
+  .term-body{padding:18px 20px; font-family:'JetBrains Mono',monospace; font-size:13.5px; min-height:180px; max-height: 300px; overflow-y: auto;}
   .term-line{margin-bottom:8px; white-space:pre-wrap; word-break:break-word;}
   .prompt{color:var(--green);}
   .prompt-path{color:var(--blue);}
@@ -262,19 +365,64 @@
     font-family:'JetBrains Mono',monospace; font-size:11.5px;
     color:var(--teal); border:1px solid var(--line); padding:5px 10px;
     border-radius:5px; cursor:pointer; background:rgba(148,226,213,0.05);
+    transition: all 0.3s;
   }
-  .term-chip:hover{border-color:var(--teal);}
+  .term-chip:hover{border-color:var(--teal); transform: translateY(-2px);}
 
   /* ---------- contact ---------- */
   .contact-grid{display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:14px;}
   .contact-card{
     background:var(--panel); border:1px solid var(--line); border-radius:8px;
     padding:18px; text-decoration:none; color:var(--text); display:block;
-    transition:.2s;
+    transition:.2s; cursor: pointer;
   }
   .contact-card:hover{border-color:var(--green); transform:translateY(-2px);}
   .contact-label{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;}
   .contact-value{font-family:'JetBrains Mono',monospace; font-size:14px; color:var(--green); margin-top:6px; word-break:break-word;}
+  .contact-card.copied {
+    border-color: var(--green);
+  }
+  .contact-card.copied .contact-label {
+    color: var(--green);
+  }
+
+  /* Tooltip */
+  .tooltip {
+    position: relative;
+    display: inline-block;
+  }
+  .tooltip .tooltiptext {
+    visibility: hidden;
+    width: 80px;
+    background-color: var(--green);
+    color: var(--bg);
+    text-align: center;
+    padding: 4px;
+    border-radius: 4px;
+    position: absolute;
+    z-index: 1;
+    bottom: 125%;
+    left: 50%;
+    margin-left: -40px;
+    opacity: 0;
+    transition: opacity 0.3s;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+  }
+  .tooltip .tooltiptext::after {
+    content: "";
+    position: absolute;
+    top: 100%;
+    left: 50%;
+    margin-left: -5px;
+    border-width: 5px;
+    border-style: solid;
+    border-color: var(--green) transparent transparent transparent;
+  }
+  .tooltip.show .tooltiptext {
+    visibility: visible;
+    opacity: 1;
+  }
 
   footer{
     text-align:center; padding:40px 20px 60px;
@@ -294,9 +442,12 @@
 </head>
 <body>
 
+<div class="progress-bar"></div>
+
 <div class="titlebar">
   <div class="dots"><span class="dot r"></span><span class="dot y"></span><span class="dot g"></span></div>
   <div class="titlebar-name">yogesh-sharma — portfolio.code-workspace</div>
+  <button class="theme-toggle" id="themeToggle">☀️</button>
 </div>
 
 <div class="layout">
@@ -323,7 +474,7 @@
 
     <div class="pane" id="top">
 
-      <div class="codeline"><span class="lineno">1</span><span class="kw">const</span> <span class="fn">student</span> <span class="punc">=</span> <span class="kw">new</span> <span class="fn">Developer</span><span class="punc">({</span></div>
+      <div class="codeline"><span class="lineno">1</span><span class="kw">const</span> <span class="fn">student</span> <span class="punc">=</span> <span class="kw">new</span> <span class="fn">Develope[...]
       <div class="codeline"><span class="lineno">2</span>&nbsp;&nbsp;name<span class="punc">:</span> <span class="str">"Yogesh Sharma"</span><span class="punc">,</span></div>
       <div class="codeline"><span class="lineno">3</span>&nbsp;&nbsp;year<span class="punc">:</span> <span class="num">2</span><span class="punc">,</span> <span class="com">// of 4</span></div>
       <div class="codeline"><span class="lineno">4</span>&nbsp;&nbsp;branch<span class="punc">:</span> <span class="str">"B.Tech CSE"</span><span class="punc">,</span></div>
@@ -331,8 +482,8 @@
       <div class="codeline"><span class="lineno">6</span><span class="punc">});</span></div>
 
       <div class="hero">
-        <h1>Yogesh <span class="accent">Sharma</span></h1>
-        <div class="role">&gt; B.Tech CSE, 2nd Year Student<span class="caret"></span></div>
+        <h1><span id="typingText"></span><span class="caret"></span></h1>
+        <div class="role">&gt; B.Tech CSE, 2nd Year Student</div>
       </div>
 
       <p class="tagline">
@@ -340,9 +491,9 @@
       </p>
 
       <div class="badges">
-        <span class="badge">📘 4th Semester</span>
-        <span class="badge">💻 DSA in progress</span>
-        <span class="badge">🌱 Always learning</span>
+        <span class="badge" data-filter="semester">📘 3rd Semester</span>
+        <span class="badge" data-filter="dsa">💻 DSA in progress</span>
+        <span class="badge" data-filter="learning">🌱 Always learning</span>
         <span class="badge">☕ Powered by chai</span>
       </div>
 
@@ -355,9 +506,9 @@
 &nbsp;&nbsp;<span class="jk">"degree"</span><span class="jp">:</span> <span class="jv">"Bachelor of Technology"</span><span class="jp">,</span><br>
 &nbsp;&nbsp;<span class="jk">"major"</span><span class="jp">:</span> <span class="jv">"Computer Science &amp; Engineering"</span><span class="jp">,</span><br>
 &nbsp;&nbsp;<span class="jk">"current_year"</span><span class="jp">:</span> <span class="jn">2</span><span class="jp">,</span><br>
-&nbsp;&nbsp;<span class="jk">"interests"</span><span class="jp">:</span> <span class="jp">[</span><span class="jv">"Web Development"</span><span class="jp">,</span> <span class="jv">"DSA"</span><span class="jp">,</span> <span class="jv">"Open Source"</span><span class="jp">,</span> <span class="jv">"AI/ML"</span><span class="jp">],</span><br>
+&nbsp;&nbsp;<span class="jk">"interests"</span><span class="jp">:</span> <span class="jp">[</span><span class="jv">"Web Development"</span><span class="jp">,</span> <span class="jv">"DSA"</span><span class="jp">,</span> <span class="jv">"Open Source"</span><span class="jp">]</span><span class="jp">,</span><br>
 &nbsp;&nbsp;<span class="jk">"motto"</span><span class="jp">:</span> <span class="jv">"Debugging life one semester at a time."</span><span class="jp">,</span><br>
-&nbsp;&nbsp;<span class="jk">"availability"</span><span class="jp">:</span> <span class="jv">"open to projects & collaboration"</span><br>
+&nbsp;&nbsp;<span class="jk">"availability"</span><span class="jp">:</span> <span class="jv">"open to projects &amp; collaboration"</span><br>
 <span class="jp">}</span>
         </div>
       </div>
@@ -366,36 +517,36 @@
       <div id="sec-skills">
         <div class="sec-title">// skills.json — click to compile</div>
         <div class="skills-grid" id="skillsGrid">
-          <div class="skill-card" data-pct="78">
-            <div class="skill-head"><span>C++</span><span class="skill-pct">78%</span></div>
+          <div class="skill-card" data-pct="35" data-tech="cpp">
+            <div class="skill-head"><span>C++</span><span class="skill-pct">35%</span></div>
             <div class="skill-bar"><div class="skill-fill"></div></div>
           </div>
-          <div class="skill-card" data-pct="70">
-            <div class="skill-head"><span>Python</span><span class="skill-pct">70%</span></div>
+          <div class="skill-card" data-pct="50" data-tech="python">
+            <div class="skill-head"><span>Python</span><span class="skill-pct">50%</span></div>
             <div class="skill-bar"><div class="skill-fill"></div></div>
           </div>
-          <div class="skill-card" data-pct="65">
-            <div class="skill-head"><span>Data Structures</span><span class="skill-pct">65%</span></div>
+          <div class="skill-card" data-pct="5" data-tech="dsa">
+            <div class="skill-head"><span>Data Structures</span><span class="skill-pct">05%</span></div>
             <div class="skill-bar"><div class="skill-fill"></div></div>
           </div>
-          <div class="skill-card" data-pct="60">
-            <div class="skill-head"><span>HTML / CSS</span><span class="skill-pct">60%</span></div>
+          <div class="skill-card" data-pct="25" data-tech="web">
+            <div class="skill-head"><span>HTML / CSS</span><span class="skill-pct">25%</span></div>
             <div class="skill-bar"><div class="skill-fill"></div></div>
           </div>
-          <div class="skill-card" data-pct="50">
-            <div class="skill-head"><span>JavaScript</span><span class="skill-pct">50%</span></div>
+          <div class="skill-card" data-pct="10" data-tech="web">
+            <div class="skill-head"><span>JavaScript</span><span class="skill-pct">10%</span></div>
             <div class="skill-bar"><div class="skill-fill"></div></div>
           </div>
-          <div class="skill-card" data-pct="40">
-            <div class="skill-head"><span>SQL</span><span class="skill-pct">40%</span></div>
+          <div class="skill-card" data-pct="0" data-tech="database">
+            <div class="skill-head"><span>SQL</span><span class="skill-pct">0%</span></div>
             <div class="skill-bar"><div class="skill-fill"></div></div>
           </div>
-          <div class="skill-card" data-pct="35">
+          <div class="skill-card" data-pct="35" data-tech="tools">
             <div class="skill-head"><span>Git / GitHub</span><span class="skill-pct">35%</span></div>
             <div class="skill-bar"><div class="skill-fill"></div></div>
           </div>
-          <div class="skill-card" data-pct="55">
-            <div class="skill-head"><span>Problem Solving</span><span class="skill-pct">55%</span></div>
+          <div class="skill-card" data-pct="45" data-tech="dsa">
+            <div class="skill-head"><span>Problem Solving</span><span class="skill-pct">45%</span></div>
             <div class="skill-bar"><div class="skill-fill"></div></div>
           </div>
         </div>
@@ -435,20 +586,26 @@
       <!-- PROJECTS -->
       <div id="sec-projects">
         <div class="sec-title">// projects.md</div>
+        <div class="proj-filter">
+          <button class="filter-btn active" data-filter="all">All</button>
+          <button class="filter-btn" data-filter="web">Web Dev</button>
+          <button class="filter-btn" data-filter="dsa">DSA</button>
+          <button class="filter-btn" data-filter="tools">Tools</button>
+        </div>
         <div class="proj-grid">
-          <div class="proj-card">
+          <div class="proj-card" data-tech="web">
             <div class="proj-name">📋 Student Task Tracker</div>
             <div class="proj-desc">A simple to-do app to manage assignments and deadlines across semesters.</div>
             <div class="proj-tags"><span class="proj-tag">HTML</span><span class="proj-tag">CSS</span><span class="proj-tag">JS</span></div>
             <div class="proj-status">● in progress</div>
           </div>
-          <div class="proj-card">
+          <div class="proj-card" data-tech="dsa">
             <div class="proj-name">🧮 DSA Visualizer</div>
             <div class="proj-desc">Visualizing sorting algorithms and basic data structures to understand them better.</div>
             <div class="proj-tags"><span class="proj-tag">Python</span><span class="proj-tag">DSA</span></div>
             <div class="proj-status">● planned</div>
           </div>
-          <div class="proj-card">
+          <div class="proj-card" data-tech="web">
             <div class="proj-name">🌐 Personal Portfolio</div>
             <div class="proj-desc">This very page — an interactive, code-themed introduction.</div>
             <div class="proj-tags"><span class="proj-tag">HTML</span><span class="proj-tag">CSS</span><span class="proj-tag">JS</span></div>
@@ -492,18 +649,18 @@
       <div id="sec-contact">
         <div class="sec-title">// contact.env</div>
         <div class="contact-grid">
-          <a class="contact-card" href="mailto:yogesh.sharma@example.com">
+          <div class="contact-card" data-copy="yogesh.sharma@example.com">
             <div class="contact-label">Email</div>
-            <div class="contact-value">yogesh.sharma@example.com</div>
-          </a>
-          <a class="contact-card" href="#" onclick="return false;">
+            <div class="contact-value">yogeshsharma942007@gmail.com</div>
+          </div>
+          <div class="contact-card" data-copy="github.com/yogeshplayz">
             <div class="contact-label">GitHub</div>
-            <div class="contact-value">github.com/yogesh-sharma</div>
-          </a>
-          <a class="contact-card" href="#" onclick="return false;">
+            <div class="contact-value">github.com/yogeshplayz</div>
+          </div>
+          <div class="contact-card" data-copy="linkedin.com/in/yogesh-sharma">
             <div class="contact-label">LinkedIn</div>
             <div class="contact-value">linkedin.com/in/yogesh-sharma</div>
-          </a>
+          </div>
           <div class="contact-card">
             <div class="contact-label">Status</div>
             <div class="contact-value">open to internships</div>
@@ -520,7 +677,59 @@
 </div>
 
 <script>
-  // Sidebar nav + scroll
+  // ========== THEME TOGGLE ==========
+  const themeToggle = document.getElementById('themeToggle');
+  const html = document.documentElement;
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  
+  function applyTheme(theme) {
+    if (theme === 'light') {
+      html.classList.add('light-mode');
+      themeToggle.textContent = '🌙';
+    } else {
+      html.classList.remove('light-mode');
+      themeToggle.textContent = '☀️';
+    }
+    localStorage.setItem('theme', theme);
+  }
+  
+  applyTheme(savedTheme);
+  themeToggle.addEventListener('click', () => {
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    applyTheme(currentTheme === 'dark' ? 'light' : 'dark');
+  });
+
+  // ========== PROGRESS BAR ==========
+  const progressBar = document.querySelector('.progress-bar');
+  window.addEventListener('scroll', () => {
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+    progressBar.style.width = scrollPercent + '%';
+  });
+
+  // ========== TYPING ANIMATION ==========
+  const typingText = document.getElementById('typingText');
+  const fullText = 'Yogesh Sharma';
+  let charIndex = 0;
+  
+  function typeText() {
+    if (charIndex < fullText.length) {
+      if (charIndex < 6) {
+        typingText.textContent += fullText[charIndex];
+      } else {
+        const span = document.createElement('span');
+        span.className = 'accent';
+        span.textContent = fullText[charIndex];
+        typingText.appendChild(span);
+      }
+      charIndex++;
+      setTimeout(typeText, 80);
+    }
+  }
+  typeText();
+
+  // ========== SIDEBAR NAVIGATION ==========
   document.querySelectorAll('.file-item').forEach(item=>{
     item.addEventListener('click', ()=>{
       document.querySelectorAll('.file-item').forEach(i=>i.classList.remove('active'));
@@ -531,7 +740,7 @@
     });
   });
 
-  // Animate skill bars when visible
+  // ========== SKILL BARS ANIMATION ==========
   const skillObserver = new IntersectionObserver((entries)=>{
     entries.forEach(entry=>{
       if(entry.isIntersecting){
@@ -555,9 +764,41 @@
     });
   });
 
-  // Terminal logic
+  // ========== PROJECT FILTER ==========
+  const filterBtns = document.querySelectorAll('.filter-btn');
+  const projCards = document.querySelectorAll('.proj-card');
+  
+  filterBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      filterBtns.forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      const filter = btn.getAttribute('data-filter');
+      
+      projCards.forEach(card => {
+        if (filter === 'all' || card.getAttribute('data-tech') === filter) {
+          card.style.display = '';
+          setTimeout(() => card.style.opacity = '1', 10);
+        } else {
+          card.style.opacity = '0';
+          setTimeout(() => card.style.display = 'none', 200);
+        }
+      });
+    });
+  });
+
+  // ========== BADGE FILTERING ==========
+  const badges = document.querySelectorAll('.badge[data-filter]');
+  badges.forEach(badge => {
+    badge.addEventListener('click', () => {
+      badge.classList.toggle('active');
+    });
+  });
+
+  // ========== TERMINAL LOGIC ==========
   const termBody = document.getElementById('termBody');
   const termInput = document.getElementById('termInput');
+  let commandHistory = [];
+  let historyIndex = -1;
 
   const responses = {
     help: "Available commands: whoami, skills, goals, fortune, contact, clear",
@@ -591,6 +832,8 @@
     const cmd = raw.trim().toLowerCase();
     if(!cmd) return;
     addPromptLine(cmd);
+    commandHistory.push(cmd);
+    historyIndex = -1;
 
     if(cmd === 'clear'){
       document.querySelectorAll('.term-line').forEach(l=>l.remove());
@@ -613,6 +856,21 @@
       runCommand(termInput.value);
       termInput.value = '';
       termBody.scrollTop = termBody.scrollHeight;
+    } else if(e.key === 'ArrowUp') {
+      e.preventDefault();
+      if(historyIndex < commandHistory.length - 1) {
+        historyIndex++;
+        termInput.value = commandHistory[commandHistory.length - 1 - historyIndex];
+      }
+    } else if(e.key === 'ArrowDown') {
+      e.preventDefault();
+      if(historyIndex > 0) {
+        historyIndex--;
+        termInput.value = commandHistory[commandHistory.length - 1 - historyIndex];
+      } else if(historyIndex === 0) {
+        historyIndex = -1;
+        termInput.value = '';
+      }
     }
   });
 
@@ -620,6 +878,22 @@
     chip.addEventListener('click', ()=>{
       runCommand(chip.getAttribute('data-cmd'));
       termBody.scrollTop = termBody.scrollHeight;
+    });
+  });
+
+  // ========== COPY TO CLIPBOARD ==========
+  document.querySelectorAll('.contact-card[data-copy]').forEach(card => {
+    card.addEventListener('click', async () => {
+      const text = card.getAttribute('data-copy');
+      try {
+        await navigator.clipboard.writeText(text);
+        card.classList.add('tooltip', 'show');
+        setTimeout(() => {
+          card.classList.remove('show');
+        }, 2000);
+      } catch (err) {
+        console.error('Failed to copy:', err);
+      }
     });
   });
 </script>
